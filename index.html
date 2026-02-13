@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Vaishnavi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0eb;
+    --grey: #888;
+    --accent: #d4d4d4;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Didact Gothic', sans-serif;
+    cursor: crosshair;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--grey); }
+
+  /* ─── PRELOADER ─── */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  #preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  #preloader .line {
+    width: 120px;
+    height: 1px;
+    background: var(--white);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: loadLine 2.5s ease forwards;
+  }
+  #preloader p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+    color: var(--grey);
+  }
+
+  @keyframes loadLine {
+    to { transform: scaleX(1); }
+  }
+
+  /* ─── GLOBAL ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideReveal {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0% 0 0); }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-15px) rotate(1deg); }
+    75% { transform: translateY(10px) rotate(-1deg); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.5); opacity: 0; }
+  }
+  @keyframes horizontalLine {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -2px); }
+    60% { transform: translate(-1px, -1px); }
+    80% { transform: translate(1px, 1px); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.15; }
+    50% { transform: translateY(-100px) scale(1.1); opacity: 0.05; }
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 60px 40px;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 50px;
+    mix-blend-mode: difference;
+  }
+  nav .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  nav .date {
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  #progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 1px;
+    background: var(--white);
+    z-index: 1001;
+    transition: width 0.3s ease;
+  }
+
+  /* ─── FLOATING PARTICLES ─── */
+  .particle {
+    position: fixed;
+    width: 2px;
+    height: 2px;
+    background: var(--white);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: breathe 4s ease infinite;
+    z-index: 1;
+  }
+
+  /* ─── SECTION 1: HERO ─── */
+  #hero {
+    flex-direction: column;
+    gap: 30px;
+    background: var(--black);
+  }
+  #hero .hero-label {
+    font-size: 0.6rem;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: var(--grey);
+    opacity: 0;
+    animation: fadeUp 1s ease 3s forwards;
+  }
+  #hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 10vw, 9rem);
+    font-weight: 400;
+    line-height: 0.95;
+    text-align: center;
+    opacity: 0;
+    animation: fadeUp 1.5s ease 3.3s forwards;
+    letter-spacing: -2px;
+  }
+  #hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    display: inline-block;
+    animation: drift 6s ease infinite 4s;
+  }
+  #hero .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: var(--grey);
+    opacity: 0;
+    animation: fadeUp 1s ease 3.8s forwards;
+  }
+  #hero .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    animation: fadeUp 1s ease 4.5s forwards;
+  }
+  #hero .scroll-indicator span {
+    font-size: 0.55rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  #hero .scroll-indicator .arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--white), transparent);
+    animation: breathe 2s ease infinite;
+  }
+
+  /* ─── GEOMETRIC ACCENT ─── */
+  .geo-ring {
+    position: absolute;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  #hero .geo-ring:nth-child(1) { width: 500px; height: 500px; top: 10%; right: -15%; animation: float 12s ease infinite; }
+  #hero .geo-ring:nth-child(2) { width: 300px; height: 300px; bottom: 15%; left: -8%; animation: float 10s ease infinite 2s; }
+  #hero .geo-ring:nth-child(3) { width: 700px; height: 700px; top: -20%; left: 30%; animation: float 15s ease infinite 4s; }
+
+  /* ─── POEM SECTIONS ─── */
+  .poem-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 40px;
+  }
+  .poem-section .chapter {
+    font-size: 0.55rem;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: var(--grey);
+    opacity: 0;
+    transition: all 1.2s ease;
+  }
+  .poem-section .verse {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 3.5vw, 2.8rem);
+    font-weight: 300;
+    line-height: 1.7;
+    max-width: 750px;
+    opacity: 0;
+    transition: all 1.5s ease 0.3s;
+    font-style: italic;
+  }
+  .poem-section .verse-accent {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: -1px;
+    opacity: 0;
+    transition: all 1.5s ease 0.5s;
+    background: linear-gradient(135deg, var(--white), var(--grey));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .poem-section .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--grey);
+    margin: 0 auto;
+    transform: scaleX(0);
+    transition: transform 1.5s ease 0.7s;
+  }
+  .poem-section.visible .chapter,
+  .poem-section.visible .verse,
+  .poem-section.visible .verse-accent { opacity: 1; transform: translateY(0); }
+  .poem-section.visible .divider { transform: scaleX(1); }
+
+  /* ─── CINEMATIC SECTION ─── */
+  .cinematic {
+    background: linear-gradient(180deg, var(--black) 0%, #111 50%, var(--black) 100%);
+  }
+  .cinematic .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1200px;
+    width: 100%;
+  }
+  .cinematic .left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  .cinematic .left-col .tag {
+    font-size: 0.55rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  .cinematic .left-col h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .cinematic .left-col p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--accent);
+  }
+  .cinematic .right-col {
+    position: relative;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cinematic .right-col .frame {
+    width: 280px;
+    height: 380px;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cinematic .right-col .frame::before {
+    content: '♡';
+    font-size: 6rem;
+    opacity: 0.08;
+    font-family: serif;
+  }
+  .cinematic .right-col .orbit {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border: 1px solid rgba(255,255,255,0.03);
+    border-radius: 50%;
+    animation: spin 20s linear infinite;
+  }
+  .cinematic .right-col .orbit::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: var(--white);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── NAME REVEAL ─── */
+  #name-reveal {
+    flex-direction: column;
+    gap: 20px;
+  }
+  #name-reveal .pre-name {
+    font-size: 0.6rem;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  #name-reveal .name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 8rem);
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: 5px;
+    opacity: 0;
+    transition: all 2s ease;
+    background: linear-gradient(90deg, var(--white) 0%, var(--grey) 50%, var(--white) 100%);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s ease infinite;
+  }
+  #name-reveal.visible .name { opacity: 1; }
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  #name-reveal .post-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--grey);
+    letter-spacing: 3px;
+  }
+
+  /* ─── QUESTION SECTION ─── */
+  #question {
+    flex-direction: column;
+    gap: 50px;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at center, #111 0%, var(--black) 70%);
+  }
+  #question .q-label {
+    font-size: 0.55rem;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  #question h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.2;
+  }
+  #question h2 em {
+    font-style: italic;
+    display: inline-block;
+    position: relative;
+  }
+  #question h2 em::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--white);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: horizontalLine 1.5s ease 1s forwards;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    min-height: 80px;
+  }
+
+  .btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    padding: 18px 55px;
+    border: 1px solid var(--white);
+    background: transparent;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    transform: translateY(101%);
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .btn:hover::before { transform: translateY(0); }
+  .btn:hover { color: var(--black); }
+  .btn span { position: relative; z-index: 1; }
+
+  #noBtn {
+    border-color: var(--grey);
+    color: var(--grey);
+    transition: all 0.3s ease;
+  }
+
+  /* ─── CELEBRATION ─── */
+  #celebration {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 10001;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  #celebration.active {
+    display: flex;
+    opacity: 1;
+  }
+  #celebration .cel-hearts {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  #celebration .cel-heart {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0;
+    animation: riseHeart 4s ease forwards;
+  }
+  @keyframes riseHeart {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    20% { opacity: 0.6; }
+    100% { opacity: 0; transform: translateY(-20vh) scale(1.5) rotate(20deg); }
+  }
+  #celebration h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 7vw, 6rem);
+    font-weight: 400;
+    text-align: center;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 1.5s ease 0.5s forwards;
+  }
+  #celebration .sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--grey);
+    letter-spacing: 3px;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.5s forwards;
+  }
+  #celebration .final-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--accent);
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 1s ease 2.5s forwards;
+    max-width: 500px;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 20px 25px; }
+    section { padding: 40px 25px; }
+    .cinematic .content { grid-template-columns: 1fr; gap: 40px; }
+    .cinematic .right-col { height: 300px; }
+    .buttons { flex-direction: column; gap: 20px; }
+  }
+
+  /* ─── INTERSECTION REVEAL ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── CURSOR GLOW ─── */
+  #cursor-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor-glow"></div>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="line"></div>
+  <p>A question awaits</p>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress"></div>
+
+<!-- PARTICLES -->
+<div id="particles"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Pour Toi</div>
+  <div class="date">XIV · II · MMXXVI</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="geo-ring"></div>
+  <div class="geo-ring"></div>
+  <div class="geo-ring"></div>
+  <div class="hero-label">A Digital Love Letter</div>
+  <h1><em>Before</em> you<br>scroll —<br>breathe.</h1>
+  <div class="hero-sub">this is yours alone</div>
+  <div class="scroll-indicator">
+    <span>Descend</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- POEM I -->
+<section class="poem-section" id="poem1">
+  <div class="chapter reveal">I — The Finding</div>
+  <div class="divider"></div>
+  <div class="verse reveal">
+    In a city of strangers and borrowed light,<br>
+    I found your frequency — quiet, bright,<br>
+    a signal in the static of ordinary nights.
+  </div>
+  <div class="verse-accent reveal">You were the silence<br>I didn't know I needed.</div>
+</section>
+
+<!-- POEM II -->
+<section class="poem-section" id="poem2">
+  <div class="chapter reveal">II — The Gravity</div>
+  <div class="divider"></div>
+  <div class="verse reveal">
+    You orbit my thoughts like slow-burning neon,<br>
+    every syllable you speak rewrites my evening,<br>
+    and I keep falling — gently, deliberately —<br>
+    into the palm of your hand.
+  </div>
+  <div class="verse-accent reveal">I didn't choose this pull.<br>It chose me.</div>
+</section>
+
+<!-- CINEMATIC -->
+<section class="cinematic" id="cinematic">
+  <div class="content">
+    <div class="left-col reveal">
+      <div class="tag">III — The Architecture</div>
+      <h2>Some people are<br>built like <em>cathedrals</em></h2>
+      <p>
+        You carry light in places most people forget to look.
+        In the pause before you laugh. In the way you hold silence
+        like it's sacred. Every detail of you — composed, effortless,
+        devastating — feels like something the universe spent
+        centuries designing.
+      </p>
+    </div>
+    <div class="right-col reveal">
+      <div class="frame"></div>
+      <div class="orbit"></div>
+    </div>
+  </div>
+</section>
+
+<!-- POEM III -->
+<section class="poem-section" id="poem3">
+  <div class="chapter reveal">IV — The Confession</div>
+  <div class="divider"></div>
+  <div class="verse reveal">
+    I have traced the outline of forever<br>
+    and it curves exactly like your name,<br>
+    I've built empires from smaller certainties<br>
+    than the way you make me feel at 2 AM.
+  </div>
+  <div class="verse-accent reveal">This isn't a maybe.<br>This is a meridian.</div>
+</section>
+
+<!-- POEM IV -->
+<section class="poem-section" id="poem4">
+  <div class="chapter reveal">V — The Devotion</div>
+  <div class="divider"></div>
+  <div class="verse reveal">
+    So here I am — no armor, no algorithm,<br>
+    just a man standing at the edge of a question,<br>
+    hoping the answer wears your smile.
+  </div>
+  <div class="verse-accent reveal">Every version of my future<br>has your name in it.</div>
+</section>
+
+<!-- NAME REVEAL -->
+<section id="name-reveal" class="poem-section">
+  <div class="pre-name reveal">This is for you</div>
+  <div class="name">Vaishnavi</div>
+  <div class="post-name reveal">the only name that sounds like home</div>
+</section>
+
+<!-- THE QUESTION -->
+<section id="question">
+  <div class="q-label reveal">The Question</div>
+  <h2 class="reveal"><em>Vaishnavi Sinha,</em><br>will you be my Valentine?</h2>
+  <div class="buttons reveal">
+    <button class="btn" id="yesBtn" onclick="sayYes()"><span>Yes</span></button>
+    <button class="btn" id="noBtn" onmouseover="runAway()" onclick="runAway()"><span>No</span></button>
+  </div>
+</section>
+
+<!-- CELEBRATION -->
+<div id="celebration">
+  <div class="cel-hearts" id="celHearts"></div>
+  <h2>She said <em>Yes.</em></h2>
+  <div class="sub">14 · 02 · 2026</div>
+  <div class="final-line">
+    And so begins the most beautiful chapter —<br>
+    written in two hands, one heartbeat.
+  </div>
+</div>
+
+<script>
+  // ─── PRELOADER ───
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('preloader').classList.add('hidden');
+    }, 2800);
+  });
+
+  // ─── CURSOR GLOW ───
+  document.addEventListener('mousemove', (e) => {
+    const glow = document.getElementById('cursor-glow');
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  });
+
+  // ─── PARTICLES ───
+  (function createParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = Math.random() * 100 + 'vh';
+      p.style.animationDelay = Math.random() * 4 + 's';
+      p.style.animationDuration = (3 + Math.random() * 4) + 's';
+      container.appendChild(p);
+    }
+  })();
+
+  // ─── SCROLL PROGRESS ───
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  // ─── INTERSECTION OBSERVER ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.reveal, .poem-section, #name-reveal').forEach(el => {
+    observer.observe(el);
+  });
+
+  // ─── RUNAWAY NO BUTTON ───
+  let noAttempts = 0;
+  const messages = [
+    "Nice try 😏",
+    "Nope!",
+    "Not happening",
+    "Try again~",
+    "You can't escape love",
+    "Just say yes ♡",
+    "I'll keep running",
+    "Resistance is futile",
+    "♡♡♡",
+    "Still no? Still running."
+  ];
+
+  function runAway() {
+    const btn = document.getElementById('noBtn');
+    noAttempts++;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const bw = btn.offsetWidth;
+    const bh = btn.offsetHeight;
+
+    const maxX = vw - bw - 20;
+    const maxY = vh - bh - 20;
+    const randX = Math.random() * maxX;
+    const randY = Math.random() * maxY;
+
+    btn.style.position = 'fixed';
+    btn.style.left = randX + 'px';
+    btn.style.top = randY + 'px';
+    btn.style.zIndex = '9999';
+    btn.style.transition = 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
+
+    btn.querySelector('span').textContent = messages[noAttempts % messages.length];
+
+    // After many attempts, shrink and fade
+    if (noAttempts > 5) {
+      btn.style.transform = `scale(${Math.max(0.3, 1 - noAttempts * 0.1)})`;
+      btn.style.opacity = Math.max(0.2, 1 - noAttempts * 0.1);
+    }
+    if (noAttempts > 10) {
+      btn.style.display = 'none';
+      // Make yes button bigger
+      const yesBtn = document.getElementById('yesBtn');
+      yesBtn.style.transform = 'scale(1.3)';
+      yesBtn.querySelector('span').textContent = '♡  YES  ♡';
+    }
+  }
+
+  // ─── SAY YES ───
+  function sayYes() {
+    const cel = document.getElementById('celebration');
+    cel.style.display = 'flex';
+    setTimeout(() => cel.classList.add('active'), 50);
+
+    // Spawn hearts
+    const heartsContainer = document.getElementById('celHearts');
+    const heartSymbols = ['♡', '♥', '❤', '💕'];
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        const heart = document.createElement('div');
+        heart.className = 'cel-heart';
+        heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = Math.random() * 2 + 's';
+        heart.style.animationDuration = (3 + Math.random() * 3) + 's';
+        heart.style.fontSize = (1 + Math.random() * 2) + 'rem';
+        heartsContainer.appendChild(heart);
+      }, i * 100);
+    }
+  }
+</script>
+</body>
+</html>
